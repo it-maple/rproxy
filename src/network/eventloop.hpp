@@ -2,7 +2,7 @@
 
 #include "acceptor.hpp"
 // #include "demultiplex.hpp"
-#include "worker_group.hpp"
+#include "group.hpp"
 
 #include <memory>
 #include <vector>
