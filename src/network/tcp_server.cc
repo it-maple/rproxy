@@ -61,6 +61,11 @@ uint16_t TcpServer::subID() const
     return id_;
 }
 
+void TcpServer::subscribe(uint16_t pubID, ::pubsub::PubType type)
+{
+    center_->subscribe(pubID, type, this);
+}
+
 void TcpServer::update(std::shared_ptr<::pubsub::Context> ctx)
 {
     switch (ctx->event_type_) {

@@ -21,6 +21,8 @@ public:
 public:
     virtual uint16_t subID() const override;
 
+    virtual void subscribe(uint16_t pubID, ::pubsub::PubType type) override;
+
     virtual void update(std::shared_ptr<::pubsub::Context> ctx) override;
 
 private:
