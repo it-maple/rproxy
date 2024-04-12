@@ -48,6 +48,8 @@ public:
     Demultiplex & operator=(Demultiplex && demultiplex) = delete;
     virtual ~Demultiplex();
 
+    void enableNotify(bool enabled);
+
     uint16_t pubID() const override;
 
     void notify(::pubsub::PubType type,
@@ -66,8 +68,9 @@ public:
     void demultiplexWait(std::shared_ptr<::pubsub::Context> ctx);
 
 private:
-    uint16_t    id_;
-    int         dmpfd_;
+    uint16_t                                id_;
+    int                                     dmpfd_;
+    bool                                    notify_;
     std::shared_ptr<::pubsub::PubSubCenter> center_;
 };
 

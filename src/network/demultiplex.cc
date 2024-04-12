@@ -10,6 +10,7 @@ namespace reactor {
 Demultiplex::Demultiplex()
     : id_(::pubsub::ID::pub_id())
     , dmpfd_(-1)
+    , notify_(true)
     , center_(::pubsub::PubSubCenter::instance())
 {
     if ((dmpfd_ = ::epoll_create(MAX_SIZE)) < 0)
@@ -27,6 +28,11 @@ Demultiplex::~Demultiplex()
     }
 }
 
+void Demultiplex::enableNotify(bool enabled)
+{
+    notify_ = enabled;
+}
+
 uint16_t Demultiplex::pubID() const
 {
     return id_;
@@ -34,7 +40,8 @@ uint16_t Demultiplex::pubID() const
 
 void Demultiplex::notify(::pubsub::PubType type, const std::shared_ptr<::pubsub::Context> ctx)
 {
-    center_->notifySubscriber(id_, type, ctx);
+    if (notify_)
+        center_->notifySubscriber(id_, type, ctx);
 }
 
 std::shared_ptr<::pubsub::PubSubCenter> Demultiplex::center() noexcept
@@ -64,7 +71,8 @@ int Demultiplex::demultiplexRegister(int sockfd)
 
     std::shared_ptr<::pubsub::Context> ctx(regiser_ctx);
 
-    center_->notifySubscriber(id_, ::pubsub::DMPREGISTER, ctx);
+    if (notify_)
+        center_->notifySubscriber(id_, ::pubsub::DMPREGISTER, ctx);
 
     struct epoll_event event;
     event.data.fd = sockfd;
@@ -78,7 +86,8 @@ int Demultiplex::demultiplexModify(std::shared_ptr<::pubsub::Context> ctx)
     ctx->event_type_ = ::pubsub::DMPMODIFY;
     auto ptr = std::dynamic_pointer_cast<context::DmpModifyContext>(ctx);
 
-    center_->notifySubscriber(id_, ::pubsub::DMPMODIFY, ctx);
+    if (notify_)
+        center_->notifySubscriber(id_, ::pubsub::DMPMODIFY, ctx);
 
     struct epoll_event event;
     event.data.fd = ptr->fd_;
@@ -92,7 +101,8 @@ int Demultiplex::demultiplexRemove(std::shared_ptr<::pubsub::Context> ctx)
     ctx->event_type_ = ::pubsub::DMPDELETE;
     auto ptr = std::dynamic_pointer_cast<context::DmpDeleteContext>(ctx);
 
-    center_->notifySubscriber(id_, ::pubsub::DMPDELETE, ctx);
+    if (notify_)
+        center_->notifySubscriber(id_, ::pubsub::DMPDELETE, ctx);
 
     return ::epoll_ctl(dmpfd_, EPOLL_CTL_DEL, ptr->fd_, nullptr);
 }
@@ -116,7 +126,8 @@ void Demultiplex::demultiplexWait(std::shared_ptr<::pubsub::Context> ctx)
     }
     
     dmpCtx->resp_events_ = std::move(resp);
-    center_->notifySubscriber(id_, ::pubsub::DMPWAIT, dmpCtx);
+    if (notify_)
+        center_->notifySubscriber(id_, ::pubsub::DMPWAIT, dmpCtx);
 }
 
 } // namespace reactor
