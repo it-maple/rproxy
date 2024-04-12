@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "context.hpp"
+#include "pub_type.hpp"
 
 namespace pubsub {
 
@@ -13,6 +14,8 @@ public:
     virtual ~Subscriber() = default;
 
     virtual uint16_t subID() const =0;
+
+    virtual void subscribe(uint16_t pubID, PubType type) =0;
 
     virtual void update(std::shared_ptr<Context> ctx) =0;
 };
