@@ -54,15 +54,17 @@ class StreamSocket
 
         int accept();
 
+        void reuseAddrPort();
+
         void close();
 
-        void reuseAddrPort();
+        static void close(int fd);
+
+        static int connectTo(InetAddr addr);
 
         static ssize_t read(int sockfd, void * const buf, size_t count);
 
         static ssize_t write(int sockfd, void const * buf, size_t count);
-
-        static void close(int fd);
 
         static void setNonBlocking(int fd);
 

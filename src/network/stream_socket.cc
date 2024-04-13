@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdexcept>
 #include <unistd.h>
 #include <string.h>
 
@@ -126,6 +127,11 @@ void StreamSocket::close()
     ::close(sockfd_);
 }
 
+void StreamSocket::close(int fd)
+{
+    ::close(fd);
+}
+
 void StreamSocket::reuseAddrPort()
 {
     int reuse = 1;
@@ -133,6 +139,24 @@ void StreamSocket::reuseAddrPort()
     assert(ret != -1);
     ret = setsockopt(sockfd_, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse));
     assert(ret != -1);
+}
+
+int StreamSocket::connectTo(InetAddr addr)
+{
+    struct sockaddr_in serverAddr;
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = ::inet_addr(addr.ip().c_str());
+    serverAddr.sin_port = ::htons(::atoi(addr.port().c_str()));
+
+    auto sock = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0)
+        throw std::runtime_error("can't create new socket");
+
+    auto ret = ::connect(sock, (struct sockaddr *) &serverAddr, sizeof(serverAddr));
+    if (ret < 0)
+        throw std::runtime_error("can not establish connection");
+
+    return sock;
 }
 
 ssize_t StreamSocket::read(int sockfd, void * const buf, size_t count)
@@ -143,11 +167,6 @@ ssize_t StreamSocket::read(int sockfd, void * const buf, size_t count)
 ssize_t StreamSocket::write(int sockfd, const void *buf, size_t count)
 {
     return ::write(sockfd, buf, count);
-}
-
-void StreamSocket::close(int fd)
-{
-    ::close(fd);
 }
 
 void StreamSocket::setNonBlocking(int fd)
