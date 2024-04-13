@@ -60,7 +60,7 @@ bool Demultiplex::demultiplexAccepted()
     return ret;
 }
 
-int Demultiplex::demultiplexRegister(int sockfd)
+int Demultiplex::demultiplexRegister(int sockfd, bool notify)
 {
     StreamSocket::setNonBlocking(sockfd);
 
@@ -71,7 +71,7 @@ int Demultiplex::demultiplexRegister(int sockfd)
 
     std::shared_ptr<::pubsub::Context> ctx(regiser_ctx);
 
-    if (notify_)
+    if ((!notify_ && notify) || (notify_ && notify))
         center_->notifySubscriber(id_, ::pubsub::DMPREGISTER, ctx);
 
     struct epoll_event event;
@@ -81,12 +81,12 @@ int Demultiplex::demultiplexRegister(int sockfd)
     return ::epoll_ctl(dmpfd_, EPOLL_CTL_ADD, event.data.fd, &event);
 }
 
-int Demultiplex::demultiplexModify(std::shared_ptr<::pubsub::Context> ctx)
+int Demultiplex::demultiplexModify(std::shared_ptr<::pubsub::Context> ctx, bool notify)
 {
     ctx->event_type_ = ::pubsub::DMPMODIFY;
     auto ptr = std::dynamic_pointer_cast<context::DmpModifyContext>(ctx);
 
-    if (notify_)
+    if ((!notify_ && notify) || (notify_ && notify))
         center_->notifySubscriber(id_, ::pubsub::DMPMODIFY, ctx);
 
     struct epoll_event event;
@@ -96,18 +96,18 @@ int Demultiplex::demultiplexModify(std::shared_ptr<::pubsub::Context> ctx)
     return ::epoll_ctl(dmpfd_, EPOLL_CTL_MOD, ptr->fd_, &event);
 }
 
-int Demultiplex::demultiplexRemove(std::shared_ptr<::pubsub::Context> ctx)
+int Demultiplex::demultiplexRemove(std::shared_ptr<::pubsub::Context> ctx, bool notify)
 {
     ctx->event_type_ = ::pubsub::DMPDELETE;
     auto ptr = std::dynamic_pointer_cast<context::DmpDeleteContext>(ctx);
 
-    if (notify_)
+    if ((!notify_ && notify) || (notify_ && notify))
         center_->notifySubscriber(id_, ::pubsub::DMPDELETE, ctx);
 
     return ::epoll_ctl(dmpfd_, EPOLL_CTL_DEL, ptr->fd_, nullptr);
 }
 
-void Demultiplex::demultiplexWait(std::shared_ptr<::pubsub::Context> ctx)
+void Demultiplex::demultiplexWait(std::shared_ptr<::pubsub::Context> ctx, bool notify)
 {
     auto dmpCtx = std::dynamic_pointer_cast<context::DmpWaitContext>(ctx);
 
@@ -126,7 +126,7 @@ void Demultiplex::demultiplexWait(std::shared_ptr<::pubsub::Context> ctx)
     }
     
     dmpCtx->resp_events_ = std::move(resp);
-    if (notify_)
+    if ((!notify_ && notify) || (notify_ && notify))
         center_->notifySubscriber(id_, ::pubsub::DMPWAIT, dmpCtx);
 }
 

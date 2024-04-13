@@ -59,13 +59,13 @@ public:
 
     bool demultiplexAccepted();
 
-    int demultiplexRegister(int sockfd);
+    int demultiplexRegister(int sockfd, bool notify = true);
 
-    int demultiplexModify(std::shared_ptr<::pubsub::Context> ctx);
+    int demultiplexModify(std::shared_ptr<::pubsub::Context> ctx, bool notify = true);
 
-    int demultiplexRemove(std::shared_ptr<::pubsub::Context> ctx);
+    int demultiplexRemove(std::shared_ptr<::pubsub::Context> ctx, bool notify = true);
 
-    void demultiplexWait(std::shared_ptr<::pubsub::Context> ctx);
+    void demultiplexWait(std::shared_ptr<::pubsub::Context> ctx, bool notify = true);
 
 private:
     uint16_t                                id_;
