@@ -16,6 +16,16 @@ InetAddr::InetAddr(std::string ip, uint16_t port)
     : ip_(ip)
     , port_(port) {}
 
+bool InetAddr::operator==(InetAddr const & addr)
+{
+    return addr.ip_ == ip_ && addr.port_ == port_;
+}
+
+bool InetAddr::operator==(InetAddr && addr)
+{
+    return addr.ip_ == ip_ && addr.port_ == port_;
+}
+
 std::string InetAddr::toString()
 {
     // [ip:port]
@@ -23,7 +33,7 @@ std::string InetAddr::toString()
     auto port = std::to_string(port_);
 
     info.append("[");
-    info.assign(ip_.c_str());
+    info.append(ip_.c_str());
     info.append(":");
 
     info.append(port.c_str());
@@ -113,7 +123,6 @@ int StreamSocket::accept()
     struct sockaddr_in clientAddr;
     auto ret = ::accept(sockfd_, (struct sockaddr *) &clientAddr, &addrLen);
     
-    // the socket is marked nonblocking and no conncetions are present to accepted.
     if (errno == EAGAIN || errno == EWOULDBLOCK)
         return ret;
 

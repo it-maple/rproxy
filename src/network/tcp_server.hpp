@@ -1,12 +1,18 @@
 #pragma once
 
+#include <sys/types.h>
+
+#include <atomic>
+
 #include "eventloop.hpp"
+#include "publisher.hpp"
 #include "tcp_connection.hpp"
 // #include "worker_group.hpp"
 
 namespace reactor {
 
-class TcpServer : public ::pubsub::Subscriber
+class TcpServer : public ::pubsub::Subscriber,
+                  public pubsub::Publisher
 {
 public:
     using TcpConnectionPtr = std::unique_ptr<TcpConnection>;
@@ -19,6 +25,10 @@ public:
     void start();
 
 public:
+    virtual uint16_t pubID() const override;
+
+    virtual void notify(::pubsub::PubType type, std::shared_ptr<::pubsub::Context> ctx) override;
+
     virtual uint16_t subID() const override;
 
     virtual void subscribe(uint16_t pubID, ::pubsub::PubType type) override;
@@ -41,7 +51,8 @@ private:
     friend void TcpConnection::sendInLoop(TcpConnection & conn);
 
 private:
-    uint16_t                                    id_;
+    uint16_t                                    sub_id_;
+    uint16_t                                    pub_id_;
     StreamSocket                                server_;
     std::shared_ptr<Acceptor>                   acceptor_;
     std::unordered_map<int, TcpConnectionPtr>   conn_map_;
@@ -51,6 +62,8 @@ private:
     EventLoop                                   loop_;
     // std::vector<EventLoop>                      loops_;
     // WorkerGroup                                 workers_;
+
+    std::atomic<ssize_t>                        total_conn_;
 };
 
 } // namespace reactor

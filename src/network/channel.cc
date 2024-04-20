@@ -28,6 +28,8 @@ void Channel::leave()
     auto del = new context::DmpDeleteContext(::pubsub::DMPDELETE);
     del->fd_ = socket_;
     std::shared_ptr<::pubsub::Context> ctx(del);
+    // FIXME: ? Is it really not necessary to notify subscribers (TcpServer)
+    // to remove TcpConnection object cached in it?
     dmp_ptr_->demultiplexRemove(ctx);
 }
 

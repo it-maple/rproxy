@@ -10,12 +10,12 @@ namespace reactor {
 class ArrayBuffer
 {
 public:
-    static const size_t INITSIZE = 1024;
+    static const size_t PACKETSIZE = 40960;
     static const size_t PREPEND = 0;
 
 public:
-    ArrayBuffer(size_t initSize = INITSIZE) noexcept;
-    ArrayBuffer(char const * ptr, size_t len, size_t initSize = INITSIZE);
+    ArrayBuffer(size_t initSize = PACKETSIZE) noexcept;
+    ArrayBuffer(char const * ptr, size_t len, size_t initSize = PACKETSIZE);
     ArrayBuffer(const ArrayBuffer &) = default;
     ArrayBuffer(ArrayBuffer &&) = default;
     ArrayBuffer & operator=(const ArrayBuffer &) = default;

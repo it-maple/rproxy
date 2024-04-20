@@ -14,11 +14,10 @@ namespace context {
 
 struct AcceptContext : ::pubsub::Context
 {
-    AcceptContext(uint16_t event, int fd)
+    AcceptContext(uint16_t event)
         : Context(event)
-        , fd_(fd) {}
+        {}
 
-    int fd_;
 };
 
 struct DmpRegisterContext : ::pubsub::Context

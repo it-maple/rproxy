@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PUBLIC compiler_flags )
 target_link_libraries(${PROJECT_NAME} PUBLIC pubsub)
+target_link_libraries(${PROJECT_NAME} PUBLIC proxy)
 
 target_include_directories(${PROJECT_NAME}
                             INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}

@@ -1,5 +1,3 @@
-#include <assert.h>
-
 #include <stdexcept>
 
 #include "buffer.hpp"
@@ -19,7 +17,7 @@ ArrayBuffer::ArrayBuffer(char const * ptr, size_t len, size_t initSize)
 {
     if (!ptr)
         throw std::logic_error("pointer is null.");
-    if (len > INITSIZE)
+    if (len > PACKETSIZE)
         throw std::logic_error("buffer size is not enough.");
 
     ::memcpy(buffer_.data(), ptr, len);
@@ -81,8 +79,11 @@ char const * ArrayBuffer::findEOL() const
 
 char const * ArrayBuffer::findEOL(char const * start)
 {
-    assert(peek() <= start);
-    assert(start <= beginWrite());
+    if (peek() > start)
+        throw std::runtime_error("Unreachable position.");
+    if (start > beginWrite())
+        throw std::runtime_error("Unreadable position");
+
     void const * eol = ::memchr(start, '\n', beginWrite() - start);
 
     return static_cast<char const *>(eol);

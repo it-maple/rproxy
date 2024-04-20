@@ -4,7 +4,6 @@
 #include <stdexcept>
 
 #include "pub_sub.hpp"
-#include "nw_ctx.hpp"
 #include "stream_socket.hpp"
 
 namespace reactor {
@@ -40,8 +39,10 @@ public:
         if (sockfd < 0)
             throw std::runtime_error("can not accept connection");
 
-        std::shared_ptr<::pubsub::Context> ctx = std::make_shared<context::AcceptContext>(::pubsub::ACCEPTED, sockfd);
-        center_->notifySubscriber(id_, ::pubsub::ACCEPTED, ctx);
+        auto && addr = StreamSocket::getPeerAddr(sockfd);
+
+        // std::shared_ptr<::pubsub::Context> ctx = std::make_shared<context::AcceptContext>(::pubsub::ACCEPTED, sockfd);
+        // center_->notifySubscriber(id_, ::pubsub::ACCEPTED, ctx);
 
         return sockfd;
     }

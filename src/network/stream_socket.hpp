@@ -15,6 +15,10 @@ public:
     InetAddr & operator=(InetAddr &&) = default;
     ~InetAddr() = default;
 
+    bool operator==(InetAddr const & addr);
+
+    bool operator==(InetAddr && addr);
+
     // [ip:port]
     std::string toString();
 
