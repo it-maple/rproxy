@@ -13,6 +13,7 @@ enum PubType : uint16_t
     DMPWAIT,
 
     // proxy
-    FORWARD
+    FORWARD,
+    BALANCE
 };
 } // namespace

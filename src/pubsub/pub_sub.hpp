@@ -1,12 +1,15 @@
 #pragma once
 
-#include "publisher.hpp"
-#include "subscriber.hpp"
+#include <cstddef>
+#include <limits.h>
 
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
 #include <unordered_set>
+
+#include "publisher.hpp"
+#include "subscriber.hpp"
 
 namespace pubsub {
 
@@ -37,6 +40,7 @@ static uint16_t pub_id()
 }
 
 } // namespace ID
+constexpr static const auto MAX_TRAFFIC= LONG_LONG_MAX;
 
 class PubSubCenter
 {
@@ -52,20 +56,24 @@ public:
 
     void unSubscribe(uint16_t pubID, PubType type, Subscriber * const sub);
 
-    void notifySubscriber(uint16_t pubID, PubType type, std::shared_ptr<Context> ctx) noexcept;
+    void notifySubscriber(uint16_t pubID, PubType type, std::shared_ptr<Context> ctx);
+
+    void account(std::string const & addr, size_t traffic);
+
+    size_t traffic(std::string const & addr);
+
+    bool isLismited(std::string const & addr);
 
     static std::shared_ptr<PubSubCenter> instance();
 
 private:
-    std::mutex          mx_;
-    std::unordered_map<uint16_t,
-                        Publisher *>
-                        publishers_;
+    std::mutex                                  mx_;
+    std::unordered_map<uint16_t, Publisher *>   publishers_;
     std::unordered_map<uint16_t,
         std::unordered_map<PubType,
-            std::unordered_set<Subscriber *>>>
-                        subcribers_;
+            std::unordered_set<Subscriber *>>>  subcribers_;
 
+    std::unordered_map<std::string, size_t>  traffic_;
 };
 
 } // namespace ::pubsub
